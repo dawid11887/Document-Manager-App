@@ -1,0 +1,351 @@
+﻿<Window x:Class="DocumentManagerApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DocumentManagerApp"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="800" Width="1200"
+        ResizeMode="CanResize" WindowStyle="None" WindowState="Maximized">
+    
+    <WindowChrome.WindowChrome>
+        <WindowChrome 
+            CaptionHeight="0" 
+            CornerRadius="0" 
+            GlassFrameThickness="0" 
+            UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+    
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FF24527A" Offset="0.0"/>
+            <GradientStop Color="#FF5DACBD" Offset="1.0"/>
+        </LinearGradientBrush>
+    </Window.Background>
+   
+    <Border BorderBrush="Gray" BorderThickness="0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <!-- Pasek -->
+                <RowDefinition/>
+                <!-- Zawartość -->
+                <RowDefinition Height="30"/>
+                <!-- Stopka -->
+            </Grid.RowDefinitions>
+            <!-- Pasek tytułowy -->
+            <Grid Grid.Row="0" Background="#214866">
+                <local:CustomTitleBar x:Name="TitleBar" Grid.Row="0"/>
+            </Grid>
+            <!-- Właściwa zawartość okna -->
+            <Grid Grid.Row="1">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- Górny panel -->
+                        <RowDefinition Height="*"/>
+                        <!-- Główna zawartość -->
+                    </Grid.RowDefinitions>
+                    <!-- 🔹 GÓRNY PANEL -->
+                    <Border CornerRadius="10" Background="#214866" Padding="0" ClipToBounds="True">
+                        <DockPanel Grid.Row="0" Margin="5,5,5,5" LastChildFill="True" Background="#214866">
+                            <!-- Wiersz: avatar + nazwa + przyciski -->
+                            <Grid DockPanel.Dock="Top" Margin="10,5,0,10" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Avatar + user -->
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border x:Name="UserAvatar"
+                                        Width="40" Height="40"
+                                        CornerRadius="25"
+                                        Background="Gray"
+                                        Margin="0,0,10,0">
+                                        <TextBlock x:Name="UserInitial"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           FontSize="20"/>
+                                    </Border>
+                                    <TextBlock x:Name="LoggedUserTextBlock"
+                                        FontWeight="Bold"
+                                        FontSize="20"
+                                        VerticalAlignment="Center"
+                                        Foreground="White"/>
+                                </StackPanel>
+                                <!-- Przycisk ustawień -->
+                                <Button x:Name="SettingButton"
+                                    Content="⚙️ Ustawienia"
+                                    Click="SettingsButton_Click"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Width="110"
+                                    Height="35"
+                                    Grid.Column="1"
+                                    Margin="5"/>
+                                <!-- Przycisk statystyk (admin) -->
+                                <Button x:Name="AdminStatsButton"
+                                    Content="📊 Panel administratora"
+                                    Click="AdminStatsButton_Click"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Width="160"
+                                    Height="35"
+                                    Grid.Column="2"
+                                    Margin="5"/>
+                                <!-- Przycisk wyloguj -->
+                                <Button Content="🚪 Wyloguj się"
+                                    x:Name="LogoutButton"
+                                    Click="LogoutButton_Click"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Width="110"
+                                    Height="35"
+                                    Grid.Column="3"
+                                    Margin="5,0,10,0"/>
+                            </Grid>
+                            <!-- 🔍 Dolny wiersz: wyszukiwarka -->
+                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                <TextBox x:Name="SearchTextBox"
+                                    Width="300" Height="30" Margin="10,0,10,10"
+                                    FontSize="14"
+                                    TextChanged="SearchTextBox_TextChanged" Tag="Szukaj obiektu" Style="{StaticResource TextBoxWithPlaceholderStyle}"/>
+                                <Button Content="Wyczyść"
+                                    Width="100" Height="30"
+                                    Click="ClearSearchButton_Click"
+                                    Style="{StaticResource ActionButtonStyle}"/>
+                            </StackPanel>
+
+                        </DockPanel>
+                    </Border>
+                    <!-- 🔹 GŁÓWNA SEKCJA (3 kolumny) -->
+                    <Grid Grid.Row="1" Margin="0,10,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <!-- Przyciski -->
+                            <ColumnDefinition Width="*"/>
+                            <!-- Tabele -->
+                            <ColumnDefinition Width="*"/>
+                            <!-- Podgląd PDF -->
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" CornerRadius="10" Background="#214866" Padding="5" ClipToBounds="True">
+                            <!-- 📌 GÓRNY BLOK: Główne przyciski -->
+                            <StackPanel Grid.Row="0" Margin="5,0,5,0" VerticalAlignment="Top">
+                                <GroupBox Header="Obiekty" Margin="0,0,0,10" TextBlock.Foreground="White">
+                                    <StackPanel Margin="5">
+                                        <Button x:Name="AddObjectButton" Width="150" Height="40" Content="➕ Dodaj" Click="AddObjectButton_Click" Style="{StaticResource ActionButtonStyle}"/>
+                                        <Button x:Name="EditObjectButton" Width="150" Height="40" Content="✏️ Edytuj" Click="EditObjectButton_Click" Style="{StaticResource ActionButtonStyle}"/>
+                                        <Button x:Name="DeleteObjectButton" Margin="0" Width="150" Height="40" Content="🗑️ Usuń" Click="DeleteObjectButton_Click" Style="{StaticResource DeleteButtonStyle}"/>
+                                    </StackPanel>
+                                </GroupBox>
+                                <GroupBox Header="Dokumenty" Margin="0,0,0,10" TextBlock.Foreground="White">
+                                    <StackPanel Margin="5">
+                                        <Button x:Name="AddDocumentButton" Width="150" Height="40" Content="📄 Dodaj" Click="AddDocumentButton_Click" Style="{StaticResource ActionButtonStyle}"/>
+                                        <Button x:Name="AddNewVersionButton"
+                                                Height="40"
+                                                Width="150"
+                                                Content="➕ Nowa wersja"
+                                                Click="AddNewVersionButton_Click"
+                                                Style="{StaticResource ActionButtonStyle}"
+                                                IsEnabled="False"/>
+                                        <Button x:Name="ShowVersionHistoryButton"
+                                                Height="40"
+                                                Width="150"
+                                                Content="📜 Historia"
+                                                Click="ShowVersionHistoryButton_Click"
+                                                Style="{StaticResource ActionButtonStyle}"
+                                                Visibility="Collapsed"/>
+                                        <Button x:Name="DeleteDocumentButton" Width="160" Height="40" Content="🗑️ Usuń" Click="DeleteDocumentButton_Click" Style="{StaticResource DeleteButtonStyle}" Margin="0"/>
+                                    </StackPanel>
+                                </GroupBox>
+                                <Button x:Name="ShowPdfButton" Content="👁️ Pokaż PDF" Width="150" Height="40" Click="ShowPdfButton_Click" Style="{StaticResource ActionButtonStyle}"/>
+                                <Button Content="📤 Raport" Width="150" Height="40" Click="ExportToPdfButton_Click" Style="{StaticResource ActionButtonStyle}"/>
+                            </StackPanel>
+                        </Border>
+                        <!-- 📌 KOLUMNA 2: TABELKI -->
+                        <Grid Grid.Column="1" Margin="10,0,10,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <!-- Filtry dokumentów -->
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <!-- ✅ Maszyny -->
+                            <DataGrid x:Name="ObjectsDataGrid" Grid.Row="0" AutoGenerateColumns="False" Margin="5"
+                                HeadersVisibility="Column" GridLinesVisibility="None" CanUserAddRows="False" IsReadOnly="True"
+                                RowHeight="35" FontSize="14" FontFamily="Segoe UI" AlternatingRowBackground="#F9F9F9"
+                                SelectionMode="Single" SelectionUnit="FullRow"
+                                Background="White" BorderThickness="1" BorderBrush="#DDD"
+                                SelectionChanged="ObjectsDataGrid_SelectionChanged">
+                                <DataGrid.Resources>
+                                    <!-- Styl nagłówków -->
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#1C3B55"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Padding" Value="8"/>
+                                    </Style>
+                                    <!-- Styl wierszy -->
+                                    <Style TargetType="DataGridRow">
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Margin" Value="0"/>
+                                        <Setter Property="Padding" Value="4"/>
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="Cursor" Value="Hand"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Style.Triggers>
+                                            <!-- Hover -->
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#E6F2FA"/>
+                                            </Trigger>
+                                            <!-- Zaznaczenie -->
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="#CCE5FF"/>
+                                                <Setter Property="Foreground" Value="Black"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Nazwa" Binding="{Binding Name}" Width="*"/>
+                                    <DataGridTextColumn Header="Lokalizacja" Binding="{Binding Location}" Width="*"/>
+                                    <DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="*"/>
+                                    <DataGridTextColumn Header="Producent" Binding="{Binding Producent}" Width="*"/>
+                                    <DataGridTextColumn Header="Model" Binding="{Binding Model}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <!-- 🔎 Filtry dokumentów -->
+                            <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,5" HorizontalAlignment="Left">
+                                <TextBox x:Name="DocumentSearchTextBox" Width="150" Height="25" Margin="5,0,10,0"
+                                FontSize="12" TextChanged="DocumentSearchTextBox_TextChanged" Tag="Szukaj dokumentu" Style="{StaticResource TextBoxWithPlaceholderStyle}"/>
+                                <ComboBox x:Name="DocumentCategoryComboBox" Width="150" Height="25" Margin="0,0,10,0"
+                                     SelectionChanged="DocumentFilter_Changed">
+                                    <ComboBoxItem Content="Wszystkie" IsSelected="True"/>
+                                    <ComboBoxItem Content="Instrukcja obsługi"/>
+                                    <ComboBoxItem Content="Certyfikat"/>
+                                    <ComboBoxItem Content="Dokumentacja techniczna"/>
+                                    <ComboBoxItem Content="Rysunek"/>
+                                    <ComboBoxItem Content="Inne"/>
+                                </ComboBox>
+                                <ComboBox x:Name="DocumentDateComboBox" Width="140" Height="25"
+                                     SelectionChanged="DocumentFilter_Changed">
+                                    <ComboBoxItem Content="Wszystkie" IsSelected="True"/>
+                                    <ComboBoxItem Content="Ostatnie 7 dni"/>
+                                    <ComboBoxItem Content="Ostatnie 30 dni"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <!-- ✅ Dokumenty -->
+                            <DataGrid x:Name="DocumentsDataGrid" Grid.Row="2" AutoGenerateColumns="False" Margin="5"
+                              HeadersVisibility="Column" GridLinesVisibility="None" CanUserAddRows="False" IsReadOnly="True"
+                              RowHeight="35" FontSize="14" FontFamily="Segoe UI" AlternatingRowBackground="#F9F9F9"
+                              SelectionMode="Single" SelectionUnit="FullRow"
+                              Background="White" BorderThickness="1" BorderBrush="#DDD"
+                              SelectionChanged="DocumentsDataGrid_SelectionChanged">
+                                <DataGrid.Resources>
+                                    <!-- Styl nagłówków -->
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#1C3B55"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Padding" Value="8"/>
+                                    </Style>
+                                    <!-- Styl wierszy -->
+                                    <Style TargetType="DataGridRow">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="Cursor" Value="Hand"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Style.Triggers>
+                                            <!-- Hover -->
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#E6F2FA"/>
+                                            </Trigger>
+                                            <!-- Zaznaczenie -->
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="#CCE5FF"/>
+                                                <Setter Property="Foreground" Value="Black"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Nazwa pliku" Binding="{Binding FileName}" Width="2*" />
+                                    <DataGridTextColumn Header="Typ" Binding="{Binding DocumentType}" Width="*" />
+                                    <DataGridTextColumn Header="Data dodania" Binding="{Binding DateAdded}" Width="2*" />
+                                    <DataGridTextColumn Header="Kategoria" Binding="{Binding Category}" Width="2*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                        <!-- 📌 KOLUMNA 3: PODGLĄD PDF -->
+                        <Border Grid.Column="2" CornerRadius="10" Background="#1C3B55" Margin="0" ClipToBounds="True">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Button x:Name="ClosePdfViewerButton"
+                                    Grid.Row="0"
+                                    Content="✕"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Foreground="White"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Width="30" Height="30"
+                                    Margin="0,5,5,0"
+                                    Cursor="Hand"
+                                    ToolTip="Zamknij podgląd"
+                                    Click="ClosePdfViewerButton_Click"
+                                    Visibility="Collapsed">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="{TemplateBinding Background}">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#5094A3"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                                <wv2:WebView2 x:Name="PdfViewer"
+                                  Grid.Row="1"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  Margin="10,5,10,10"
+                                  Visibility="Collapsed"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <!-- Stopka -->
+            <Grid Grid.Row="2" Background="#214866">
+                <TextBlock
+                   Text="Aplikacja do zarządzania dokumentacją teczhniczną - Dawid Brzeń" 
+                   HorizontalAlignment="Left" 
+                   VerticalAlignment="Center"
+                   Margin="10,0,10,0"
+                   Foreground="White"
+                   FontSize="14"/>
+                <TextBlock x:Name="MiniLogTextBlock" 
+                   HorizontalAlignment="Right" 
+                   VerticalAlignment="Center"
+                   Margin="0,0,10,0"
+                   Foreground="White"
+                   FontSize="14"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,46 @@
+# Visual Studio generated
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vspscc
+*_i.c
+*_p.c
+*_i.h
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vsix
+*.vsp
+*.xssf
+*.luaproj.loca
+*.suo.tmp
+
+# Folders
+[Bb]in/
+[Dd]ebug/
+[Rr]elease/
+[Oo]bj/
+_ReSharper*/
+.vs/
+packages/
+TestResults/
+
+# Specific files
+*.db
+*.db-journal*
+
+# User settings
+App.config

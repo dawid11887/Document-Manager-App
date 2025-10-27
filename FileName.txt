@@ -1,0 +1,139 @@
+﻿<Window x:Class="DocumentManagerApp.Views.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Logowanie"
+        Height="500"
+        Width="400"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FF24527A" Offset="0.0"/>
+            <GradientStop Color="#FF5DACBD" Offset="1.0"/>
+        </LinearGradientBrush>
+    </Window.Background>
+    <Window.Resources>
+        
+        <!-- 🎨 Kolory -->
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#5094A3"/>
+        <SolidColorBrush x:Key="PrimaryBrushHover" Color="#2F6CA1"/>
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="White"/>
+        
+        <!-- 🎨 Styl dla przycisków akcji -->
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="180"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource PrimaryBrushHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border CornerRadius="12" Padding="0" Background="#FAFAFA" Margin="30,20,30,20">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
+            <!-- Logo / ikona -->
+            <Grid Width="80" Height="80">
+                <Ellipse Fill="#5094A3" />
+                <TextBlock Text="📂" FontSize="36"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               TextAlignment="Center"/>
+            </Grid>
+
+            <!-- Tytuł aplikacji -->
+            <TextBlock Text="Aplikacja do zarządzania 
+                       dokumentacją techniczną"
+                       TextAlignment="Center"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,15,0,5"
+                       TextWrapping="Wrap"/>
+
+            <!-- Podtytuł -->
+            <TextBlock Text="Bezpieczny dostęp do dokumentów maszyn"
+                       FontSize="12"
+                       Opacity="0.7"
+                       TextAlignment="Center"
+                       Margin="0,0,0,20"/>
+
+            <!-- Pola logowania -->
+            <StackPanel Margin="0,0,0,10">
+                <TextBlock Text="Nazwa użytkownika" FontSize="12"/>
+                <TextBox x:Name="UsernameBox" Height="28" Margin="0,5,0,10"/>
+
+                <TextBlock Text="Hasło" FontSize="12"/>
+                <PasswordBox x:Name="PasswordBox" Height="28" Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <!-- Pamiętaj mnie + zapomniałem hasła MOŻE KIEDYŚ DOROBIE-->
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Right"
+                        Margin="0,5,0,15">
+                <!--<TextBlock Text="Zapomniałeś hasła?" 
+                           Foreground="#3B82F6" 
+                           FontSize="11" 
+                           Margin="10,0,0,0"
+                           Cursor="Hand"/> -->
+            </StackPanel>
+
+            <!-- Przycisk logowania -->
+            <Button Content="Zaloguj" 
+                    Width="100" Height="32"
+                    FontWeight="Bold"
+                    HorizontalAlignment="Center"
+                    Click="Login_Click"
+                    IsDefault="True"
+                    Style="{StaticResource ActionButtonStyle}"/>
+
+            <!-- Wersja aplikacji -->
+            <TextBlock Text="v1.0.0" 
+                       HorizontalAlignment="Right"
+                       FontSize="10" 
+                       Opacity="0.5"
+                       Margin="0,15,0,0"/>
+        </StackPanel>
+    </Border>
+</Window>
+
+
+
+WindowStyle="None">
+
+    <Border BorderBrush="Gray" BorderThickness="0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <!-- Pasek -->
+                <RowDefinition/>
+                <!-- Zawartość -->
+            </Grid.RowDefinitions>
+
+            <!-- Pasek tytułowy -->
+            <Grid Grid.Row="0" Background="#214866">
+                <local:CustomTitleBar Grid.Row="0"/>
+            </Grid>
+            
+            <Grid Grid.Row="1">
+            
+            <!-- Właściwa zawartość okna -->
+            
+            </Grid>
+        </Grid>
+    </Border>

@@ -1,0 +1,290 @@
+﻿<UserControl x:Class="DocumentManagerApp.Views.UsersManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DocumentManagerApp.Views"
+             Height="500" Width="650">
+
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#5094A3"/>
+        <SolidColorBrush x:Key="PrimaryBrushHover" Color="#2F6CA1"/>
+        <SolidColorBrush x:Key="PrimaryBrushDEL" Color="#FF4B5C"/>
+        <SolidColorBrush x:Key="PrimaryBrushHoverDEL" Color="#7C262F"/>
+
+        <!-- Konwertery: 1) pierwsza litera, 2) kolor avatara z nazwy -->
+        <local:FirstLetterConverter x:Key="FirstLetterConverter"/>
+        <local:UsernameColorBrushConverter x:Key="UsernameColorBrushConverter"/>
+
+        <!-- Tło kafelków -->
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFF3F4F6"/>
+
+        <!-- Brak hover/selection highlight + rozciąganie na szerokość -->
+        <Style x:Key="NoHoverListViewItemStyle" TargetType="ListViewItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <!-- Brak triggerów -> żadnego podświetlania hover/selection -->
+                        <Border Background="{TemplateBinding Background}">
+                            <ContentPresenter/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource PrimaryBrushHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- PRZYCISKI DELETE -->
+        <Style x:Key="DeleteButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrushDEL}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource PrimaryBrushHoverDEL}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="EditPasswordGroupBoxStyle" TargetType="GroupBox">
+            <Setter Property="BorderBrush" Value="#AAAAAA"/>
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel Margin="0">
+        <!-- Pasek u góry -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0 0 0 10">
+            <Button Content="⬅ Powrót" Width="100" Height="32" Margin="0,0,8,0" FontWeight="Bold" IsDefault="True"
+                    Click="Back_Click" Style="{StaticResource ActionButtonStyle}"/>
+            <TextBlock Text="Zarządzanie użytkownikami"
+                       VerticalAlignment="Center"
+                       FontSize="16" FontWeight="SemiBold" Foreground="White"/>
+        </StackPanel>
+        <!-- Panel edycji (ukryty domyślnie) -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Lista użytkowników -->
+                <RowDefinition Height="Auto"/>
+                <!-- Panel edycji -->
+            </Grid.RowDefinitions>
+
+            <!-- Lista kafelków -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0">
+                <ListView x:Name="UsersList"
+                  BorderThickness="0"
+                  Background="Transparent"
+                  Margin="0"
+                  ItemContainerStyle="{StaticResource NoHoverListViewItemStyle}"
+                  HorizontalContentAlignment="Stretch">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="12"
+                            Background="{StaticResource CardBackgroundBrush}"
+                            Padding="12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Avatar -->
+                                    <Border Grid.Column="0"
+                                    Width="40" Height="40"
+                                    CornerRadius="20"
+                                    VerticalAlignment="Center"
+                                    Background="{Binding Username, Converter={StaticResource UsernameColorBrushConverter}}">
+                                        <TextBlock Text="{Binding Username, Converter={StaticResource FirstLetterConverter}}"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           FontSize="16"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <!-- Teksty -->
+                                    <StackPanel Grid.Column="1"
+                                        Orientation="Vertical"
+                                        Margin="12,0"
+                                        VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Username}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding Role}"
+                                           FontSize="12"
+                                           Opacity="0.8"/>
+                                    </StackPanel>
+
+                                    <!-- Akcje -->
+                                    <StackPanel Grid.Column="2"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Right">
+                                        <Button Content="Edytuj"
+                                        Margin="0,5,5,5"
+                                        Click="Edit_Click"
+                                        IsDefault="True"
+                                        FontWeight="Bold"    
+                                        Style="{StaticResource ActionButtonStyle}"/>
+                                        <Button Content="Usuń"
+                                        Margin="0,5,5,5"
+                                        Click="Delete_Click"
+                                        IsDefault="True"
+                                        FontWeight="Bold"
+                                        Style="{StaticResource DeleteButtonStyle}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </ScrollViewer>
+
+            <!-- Panel edycji -->
+            <Border Grid.Row="1"
+                x:Name="EditUserPanel"
+                Background="WhiteSmoke"
+                CornerRadius="12"
+                Padding="12,17"
+                Margin="1"
+                Visibility="Collapsed">
+
+                <StackPanel>
+                    <!-- Górna część: Avatar + nazwa i rola -->
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Avatar -->
+                        <Border Grid.Column="0"
+                            Width="40" Height="40"
+                            CornerRadius="20"
+                            VerticalAlignment="Center"
+                            Background="{Binding Username, Converter={StaticResource UsernameColorBrushConverter}}">
+                            <TextBlock Text="{Binding Username, Converter={StaticResource FirstLetterConverter}}"
+                               Foreground="White"
+                               FontWeight="Bold"
+                               FontSize="16" 
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- Nazwa i rola -->
+                        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="EditUsernameText" FontSize="14" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="EditRoleText" FontSize="12" Opacity="0.7"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Zmiana hasła -->
+                    <GroupBox Header="🔑 Zmiana hasła" Margin="10,0,10,10" TextBlock.Foreground="Black" Style="{StaticResource EditPasswordGroupBoxStyle}"> 
+                        <StackPanel Margin="10">
+                            <Button x:Name="ResetPasswordButton"
+                            Content="🔑 Resetuj Hasło" Background="Green"
+                            Width="210" Height="40" HorizontalAlignment="Center"
+                            Click="ResetPasswordButton_Click"
+                            Style="{StaticResource ActionButtonStyle}"/>
+
+                            <StackPanel x:Name="ChangePasswordPanel" Visibility="Collapsed" Margin="50,10,50,0">
+                                <TextBlock Text="Nowe hasło:" FontSize="11" Margin="0,0,0,2"/>
+                                <PasswordBox x:Name="NewPasswordBox" Height="28" Margin="0,0,0,10"
+                                     BorderBrush="{StaticResource TextBoxBorderBrush}" BorderThickness="1">
+                                    <PasswordBox.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="4"/>
+                                        </Style>
+                                    </PasswordBox.Resources>
+                                    <PasswordBox.Style>
+                                        <Style TargetType="PasswordBox">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsFocused" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{StaticResource TextBoxFocusBorderBrush}"/>
+                                                    <Setter Property="BorderThickness" Value="1.5"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </PasswordBox.Style>
+                                </PasswordBox>
+
+                                <TextBlock Text="Potwierdź nowe hasło:" FontSize="11" Margin="0,0,0,2"/>
+                                <PasswordBox x:Name="ConfirmPasswordBox" Height="28" Margin="0,0,0,10"
+                                     BorderBrush="{StaticResource TextBoxBorderBrush}" BorderThickness="1">
+                                    <PasswordBox.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="4"/>
+                                        </Style>
+                                    </PasswordBox.Resources>
+                                    <PasswordBox.Style>
+                                        <Style TargetType="PasswordBox">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsFocused" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{StaticResource TextBoxFocusBorderBrush}"/>
+                                                    <Setter Property="BorderThickness" Value="1.5"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </PasswordBox.Style>
+                                </PasswordBox>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                                    <Button Content="Resetuj" Width="100" Height="40" 
+                                    Click="ChangePassword_Click" Style="{StaticResource ActionButtonStyle}" Margin="0,0,10,0"/>
+                                    <Button Content="Anuluj" Width="100" Height="40" Margin="0"
+                                    Click="CancelPasswordReset_Click" Style="{StaticResource DeleteButtonStyle}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <!-- Przyciski -->
+                    <Button Content="Wyjdź" Width="210" HorizontalAlignment="Center" Margin="0,5,0,0" Click="CancelEdit_Click" IsDefault="True"
+                        FontWeight="Bold" 
+                        Style="{StaticResource DeleteButtonStyle}"/> 
+                </StackPanel>
+            </Border>
+        </Grid>
+
+    </DockPanel>
+</UserControl>

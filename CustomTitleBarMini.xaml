@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="DocumentManagerApp.CustomTitleBarMini"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="30" Background="#214866">
+    <UserControl.Resources>
+        <Style x:Key="BarButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Background" Value="#2F6CA1"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#5094A3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <!-- cały pasek (obsługa przeciągania podpięta w code-behind) -->
+    <Grid MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock VerticalAlignment="Center"
+                   Margin="10,0,0,0"
+                   Foreground="White"
+                   FontFamily="Segoe UI"
+                   Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}"/>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+            <Button FontFamily="Segoe MDL2 Assets" Content="&#xE921;" Click="Minimize_Click" Style="{StaticResource BarButtonStyle}"/>
+            <Button FontFamily="Segoe MDL2 Assets" Content="&#xE8BB;" Click="Close_Click" Style="{StaticResource BarButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

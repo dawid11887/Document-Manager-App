@@ -1,0 +1,114 @@
+﻿<Window x:Class="DocumentManagerApp.Views.AddDocumentWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DocumentManagerApp"
+        mc:Ignorable="d"
+        Title="Dodaj dokument"
+        Height="450" Width="480" WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize" WindowStyle="None">
+
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FF24527A" Offset="0.0"/>
+            <GradientStop Color="#FF5DACBD" Offset="1.0"/>
+        </LinearGradientBrush>
+    </Window.Background>
+
+    <Window.Resources>
+        <Style x:Key="SelectFileInsideDropZoneStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="Width" Value="180"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Margin" Value="0,10,0,0"/>
+        </Style>
+        <Style x:Key="SaveButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="0,15,0,0"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Border BorderBrush="Gray" BorderThickness="0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Background="#214866">
+                <local:CustomTitleBarMini Grid.Row="0"/>
+            </Grid>
+
+            <Border Grid.Row="1" CornerRadius="12" Background="#FAFAFA" Margin="30,20,30,20">
+                <Grid Margin="15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock x:Name="TargetObjectText" Grid.Row="0" Margin="5,0,5,10" FontWeight="SemiBold" FontSize="14" Text="Dodajesz dokument do obiektu: ..." TextAlignment="Center" TextWrapping="Wrap"/>
+
+                    <Border x:Name="DropTargetBorder" Grid.Row="1"
+                            Background="#F0F0F0" BorderBrush="#CCCCCC"
+                            BorderThickness="2" CornerRadius="8"
+                            AllowDrop="True"
+                            PreviewDragEnter="DropTarget_PreviewDragEnter"
+                            PreviewDragLeave="DropTarget_PreviewDragLeave"
+                            Drop="DropTarget_Drop"
+                            MinHeight="150">
+                        <Grid>
+                            <StackPanel x:Name="BeforeDropPanel" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="⬆️" FontSize="36" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                                <TextBlock Text="Przeciągnij plik PDF tutaj" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="lub" FontSize="12" Opacity="0.7" HorizontalAlignment="Center" Margin="0,5"/>
+                                <Button x:Name="SelectFileButton" Content="Wybierz plik z dysku"
+                                        Style="{StaticResource SelectFileInsideDropZoneStyle}"
+                                        Click="SelectFileButton_Click" />
+                            </StackPanel>
+
+                            <StackPanel x:Name="AfterDropPanel" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed">
+                                <TextBlock Text="✅" FontSize="36" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="Green"/>
+                                <TextBlock Text="Wybrany plik:" FontSize="12" Opacity="0.7" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="SelectedFileNameText" Text="nazwa_pliku.pdf" FontSize="14" FontWeight="SemiBold"
+                                           HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="300"
+                                           Foreground="Black"/>
+                                <Button Content="Zmień plik" Margin="0,15,0,0" Width="100" Height="25" FontSize="11"
+                                        Click="SelectFileButton_Click"/>
+                            </StackPanel>
+
+                            <Border x:Name="DropOverlay"
+                                    Background="#AAFFFFFF"
+                                    BorderBrush="#5094A3"
+                                    BorderThickness="2"
+                                    CornerRadius="8"
+                                    Visibility="Collapsed">
+                                <TextBlock Text="📂 Upuść plik PDF tutaj"
+                                           FontSize="18" FontWeight="Bold"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           Foreground="#214866"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <StackPanel Grid.Row="2" Margin="0,15,0,0">
+                        <TextBlock Text="Wybierz kategorię dokumentu:" Margin="0,0,0,5" FontWeight="SemiBold" FontSize="12"/>
+                        <ComboBox x:Name="CategoryComboBox" Width="200" HorizontalAlignment="Center">
+                            <ComboBoxItem Content="Instrukcja obsługi" />
+                            <ComboBoxItem Content="Certyfikat" />
+                            <ComboBoxItem Content="Dokumentacja techniczna" />
+                            <ComboBoxItem Content="Rysunek" />
+                            <ComboBoxItem Content="Inne" IsSelected="True"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <Button Grid.Row="3" Content="Zapisz" Style="{StaticResource SaveButtonStyle}" Click="SaveButton_Click" IsDefault="True"/>
+
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
