@@ -27,7 +27,6 @@
         </Style>
     </UserControl.Resources>
 
-    <!-- cały pasek (obsługa przeciągania podpięta w code-behind) -->
     <Grid MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

@@ -20,18 +20,14 @@
                 <RowDefinition/>
                 <!-- Zawartość -->
             </Grid.RowDefinitions>
-
             <!-- Pasek tytułowy -->
             <Grid Grid.Row="0" Background="#214866">
                 <local:CustomTitleBarMini Grid.Row="0"/>
             </Grid>
-
             <Grid Grid.Row="1">
-
                 <Grid>
                     <ContentControl x:Name="MainContent" />
                 </Grid>
-
             </Grid>
         </Grid>
     </Border>

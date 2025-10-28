@@ -40,7 +40,7 @@ namespace DocumentManagerApp
             ObjectsDataGrid.ItemsSource = GetObjects();
             ObjectsDataGrid.SelectionChanged += ObjectsDataGrid_SelectionChanged;
 
-            // Przykład: blokowanie przycisków dla zwykłego użytkownika
+            // blokowanie przycisków dla zwykłego użytkownika
             if (!UserSession.IsAdmin)
             {
                 AddObjectButton.Visibility = Visibility.Collapsed;
@@ -49,7 +49,6 @@ namespace DocumentManagerApp
                 AddDocumentButton.Visibility = Visibility.Collapsed;
                 DeleteDocumentButton.Visibility = Visibility.Collapsed; 
                 AdminStatsButton.Visibility = Visibility.Collapsed;
-                // itd.
             }
             if (UserSession.CurrentUser != null)
             {
@@ -70,7 +69,6 @@ namespace DocumentManagerApp
         }
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            // jeśli chcesz, żeby MainWindow od razu wyglądał jak zmaksymalizowany (ale bez fullscreen)
             TitleBar?.MaximizeWindowToWorkAreaInitial();
         }
         private void ReloadData()
@@ -87,18 +85,16 @@ namespace DocumentManagerApp
                 DocumentsDataGrid.ItemsSource = null;
             }
         }
-        private Document selectedDocument = null; // albo inny typ danych reprezentujący dokument
+        private Document selectedDocument = null;
         private void DocumentsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             selectedDocument = DocumentsDataGrid.SelectedItem as Document;
 
-            // ✨ UKRYJ podgląd i przycisk "X", jeśli dokument jest odznaczony ✨
             if (selectedDocument == null)
             {
                 PdfViewer.Visibility = Visibility.Collapsed;
                 ClosePdfViewerButton.Visibility = Visibility.Collapsed;
             }
-            // Zawsze aktualizuj stan przycisków po zmianie zaznaczenia dokumentu
             UpdateButtonStates();
         }
         private void ShowPdfButton_Click(object sender, RoutedEventArgs e)
@@ -111,25 +107,21 @@ namespace DocumentManagerApp
                 if (System.IO.File.Exists(pdfPath))
                 {
                     PdfViewer.Source = new Uri(pdfPath);
-                    // ✨ POKAŻ podgląd i przycisk "X" ✨
                     PdfViewer.Visibility = Visibility.Visible;
                     ClosePdfViewerButton.Visibility = Visibility.Visible;
                 }
                 else
                 {
                     MessageBox.Show("Plik PDF nie został znaleziony:\n" + pdfPath);
-                    // ✨ UKRYJ podgląd i przycisk "X", jeśli plik nie istnieje ✨
                     PdfViewer.Visibility = Visibility.Collapsed;
                     ClosePdfViewerButton.Visibility = Visibility.Collapsed;
                 }
             }
-            // Nie musimy nic robić, jeśli nie wybrano dokumentu, bo przycisk jest nieaktywny
-            // A jeśli był wcześniej widoczny, to zmiana zaznaczenia go ukryje (krok 3)
         }
         private Color GetRandomColor()
         {
             var rand = new Random(Guid.NewGuid().GetHashCode());
-            byte r = (byte)rand.Next(50, 200);  // 50–200, żeby nie były zbyt jasne/ciemne
+            byte r = (byte)rand.Next(50, 200);
             byte g = (byte)rand.Next(50, 200);
             byte b = (byte)rand.Next(50, 200);
 
@@ -146,32 +138,25 @@ namespace DocumentManagerApp
             if (resultConfirm != MessageBoxResult.Yes)
                 return;
 
-            // Wyczyść sesję
             UserSession.Logout();
 
-            // Zapamiętaj referencję do aplikacji
             var app = Application.Current;
 
-            // Ukryj stare okno od razu, żeby nie migało
             this.Hide();
 
-            // Pokaż okno logowania
             var loginWindow = new LoginWindow();
             bool? result = loginWindow.ShowDialog();
 
             if (result == true && UserSession.CurrentUser != null)
             {
-                // Stare okno już niepotrzebne – zamknij
                 this.Close();
 
-                // Uruchom nowy MainWindow po zalogowaniu
                 var mainWindow = new MainWindow();
                 app.MainWindow = mainWindow;
                 mainWindow.Show();
             }
             else
             {
-                // Zamyka aplikację jeśli anulowano logowanie
                 app.Shutdown();
             }
         }
@@ -182,7 +167,7 @@ namespace DocumentManagerApp
         private void AddObjectButton_Click(object sender, RoutedEventArgs e)
         {
             var addObjectWindow = new DocumentManagerApp.Views.AddObjectWindow();
-            addObjectWindow.Owner = this; // opcjonalnie, by okno było modalne względem MainWindow
+            addObjectWindow.Owner = this;
             addObjectWindow.OnDataChanged = RefreshMiniLog;
             if (addObjectWindow.ShowDialog() == true)
             {
@@ -198,8 +183,6 @@ namespace DocumentManagerApp
                 MessageBox.Show("Najpierw wybierz obiekt, do którego chcesz dodać dokument.", "Informacja", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-
-            // Tworzymy okno, przekazując mu ZAZNACZONY obiekt
             var addDocWindow = new DocumentManagerApp.Views.AddDocumentWindow(selectedObject);
             addDocWindow.OnDataChanged = RefreshMiniLog;
 
@@ -207,15 +190,12 @@ namespace DocumentManagerApp
             {
                 MessageBox.Show("Dokument dodany.");
 
-                // Pobieramy ID maszyny z okna dialogowego
                 int? objectId = addDocWindow.NewlyAddedDocumentObjectId;
 
                 if (objectId.HasValue)
                 {
-                    // Sprawdzamy, czy tabela maszyn jest aktualnie zaznaczona na tej maszynie
                     if (ObjectsDataGrid.SelectedItem is Models.Object currentSelection && currentSelection.Id == objectId.Value)
                     {
-                        // Jeśli tak, odświeżamy tylko listę dokumentów
                         LoadDocumentsForObject(objectId.Value);
                     }
                 }
@@ -230,17 +210,15 @@ namespace DocumentManagerApp
                 DocumentSearchTextBox.Text = "";
                 DocumentCategoryComboBox.SelectedIndex = 0;
                 DocumentDateComboBox.SelectedIndex = 0;
-                ApplyDocumentFilters(); // To ustawi ItemsSource dla DocumentsDataGrid
+                ApplyDocumentFilters();
             }
             else
             {
                 currentObjectDocuments.Clear();
                 DocumentsDataGrid.ItemsSource = null;
-                // ✨ UKRYJ podgląd i przycisk "X", gdy obiekt jest odznaczony ✨
                 PdfViewer.Visibility = Visibility.Collapsed;
                 ClosePdfViewerButton.Visibility = Visibility.Collapsed;
             }
-            // Zawsze aktualizuj stan przycisków po zmianie zaznaczenia obiektu
             UpdateButtonStates();
         }
         private void DocumentSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -253,7 +231,6 @@ namespace DocumentManagerApp
         }
         private void ApplyDocumentFilters()
         {
-            // jeśli którakolwiek kontrolka jest null, kończymy
             if (DocumentsDataGrid == null || DocumentSearchTextBox == null
                 || DocumentCategoryComboBox == null || DocumentDateComboBox == null)
                 return;
@@ -295,10 +272,7 @@ namespace DocumentManagerApp
         }
         private void LoadDocumentsForObject(int objectId)
         {
-            // Pracownik (Load) prosi Posłańca (Get) o dostarczenie danych
             var documents = GetDocumentsForObject(objectId);
-
-            // Pracownik (Load) wykłada otrzymane dane na półkę (DataGrid)
             DocumentsDataGrid.ItemsSource = documents;
         }
         // USUWANIE OBIEKTÓW
@@ -311,17 +285,14 @@ namespace DocumentManagerApp
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    // ✨ CAŁA LOGIKA BAZY DANYCH ZASTĄPIONA JEDNĄ LINIĄ ✨
                     DatabaseHelper.DeleteObjectAndAssociatedDocuments(selectedObject.Id);
 
                     DatabaseHelper.AddChangeLog(UserSession.CurrentUser.Username, "Usunięto obiekt", $"Obiekt: {selectedObject.Name}");
                     RefreshMiniLog();
 
-                    // Ścieżka do folderu maszyny
                     string baseStoragePath = System.IO.Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "DocumentsStorage");
                     string objectFolder = System.IO.Path.Combine(baseStoragePath, $"Object_{selectedObject.Id}");
 
-                    // Sprawdź, czy folder istnieje
                     if (Directory.Exists(objectFolder))
                     {
                         if (Directory.EnumerateFileSystemEntries(objectFolder).Any())
@@ -334,7 +305,7 @@ namespace DocumentManagerApp
                             {
                                 try
                                 {
-                                    Directory.Delete(objectFolder, true); // usuwa również zawartość
+                                    Directory.Delete(objectFolder, true);
                                 }
                                 catch (Exception ex)
                                 {
@@ -344,7 +315,6 @@ namespace DocumentManagerApp
                         }
                         else
                         {
-                            // Folder pusty – usuń bez pytania
                             try
                             {
                                 Directory.Delete(objectFolder);
@@ -355,7 +325,6 @@ namespace DocumentManagerApp
                             }
                         }
                     }
-
                     ObjectsDataGrid.ItemsSource = GetObjects();
                     ObjectsDataGrid.SelectedItem = null;
                     DocumentsDataGrid.ItemsSource = null;
@@ -374,35 +343,30 @@ namespace DocumentManagerApp
         {
             if (DocumentsDataGrid.SelectedItem is Document selectedDoc)
             {
-                // Ostrzeżenie (bez zmian)
                 var result = MessageBox.Show($"Czy na pewno chcesz usunąć dokument '{selectedDoc.FileName}'\n***ORAZ WSZYSTKIE JEGO POPRZEDNIE WERSJE?***\n\nTej operacji nie będzie można cofnąć!",
                                               "Potwierdzenie usunięcia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    // --- 👇 NOWA LOGIKA USUWANIA PLIKÓW 👇 ---
                     int? groupId = selectedDoc.VersionGroupId;
                     List<string> filePathsToDelete = new List<string>();
 
-                    // 1. Pobierz ścieżki wszystkich plików z grupy wersji
                     if (groupId.HasValue)
                     {
                         filePathsToDelete = DatabaseHelper.GetFilePathsForVersionGroup(groupId);
                     }
                     else
                     {
-                        // Jeśli z jakiegoś powodu nie ma groupId, dodaj tylko bieżący plik
                         if (!string.IsNullOrEmpty(selectedDoc.FilePath))
                         {
                             filePathsToDelete.Add(selectedDoc.FilePath);
                         }
                     }
 
-                    // 2. Usuń fizyczne pliki z dysku
                     string baseStoragePath = System.IO.Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "DocumentsStorage");
                     foreach (string relativePath in filePathsToDelete)
                     {
-                        if (string.IsNullOrEmpty(relativePath)) continue; // Pomiń puste ścieżki
+                        if (string.IsNullOrEmpty(relativePath)) continue;
 
                         string fullFilePath = System.IO.Path.Combine(baseStoragePath, relativePath);
                         if (File.Exists(fullFilePath))
@@ -414,7 +378,6 @@ namespace DocumentManagerApp
                             }
                             catch (Exception ex)
                             {
-                                // Wyświetl błąd, ale kontynuuj usuwanie reszty i wpisów w bazie
                                 MessageBox.Show($"Nie udało się usunąć pliku fizycznego:\n{fullFilePath}\nBłąd: {ex.Message}", "Błąd usuwania pliku", MessageBoxButton.OK, MessageBoxImage.Warning);
                             }
                         }
@@ -423,12 +386,8 @@ namespace DocumentManagerApp
                             Console.WriteLine($"Plik nie znaleziony (pomijanie): {fullFilePath}");
                         }
                     }
-                    // --- Koniec nowej logiki usuwania plików ---
+                    DatabaseHelper.DeleteDocumentAndAllVersions(groupId);
 
-                    // 3. Usuń wpisy z bazy danych (tak jak wcześniej)
-                    DatabaseHelper.DeleteDocumentAndAllVersions(groupId); // Przekazujemy groupId
-
-                    // Logika ChangeLog (bez zmian)
                     var objectDB = ObjectsDataGrid.ItemsSource?
                                  .OfType<Models.Object>()
                                  .FirstOrDefault(m => m.Id == selectedDoc.ObjectId);
@@ -441,7 +400,6 @@ namespace DocumentManagerApp
                     );
                     RefreshMiniLog();
 
-                    // Odśwież widok
                     LoadDocumentsForObject(selectedDoc.ObjectId);
                     UpdateButtonStates();
                 }
@@ -484,7 +442,7 @@ namespace DocumentManagerApp
             ).ToList();
 
             ObjectsDataGrid.ItemsSource = filteredObjects;
-            DocumentsDataGrid.ItemsSource = null; // czyszczenie dolnej tabeli
+            DocumentsDataGrid.ItemsSource = null;
         }
         // PRZYCISK WYCZYŚĆ WYSZUKIWARKI
         private void ClearSearchButton_Click(object sender, RoutedEventArgs e)
@@ -496,15 +454,12 @@ namespace DocumentManagerApp
         // EKSPORT RAPORTU PDF
         private void ExportToPdfButton_Click(object sender, RoutedEventArgs e)
         {
-            // === Krok 1: Pobranie danych ===
             var objects = GetObjects();
-            var documents = new List<ModelDocument>(); // Używamy Twojego aliasu 'ModelDocument'
+            var documents = new List<ModelDocument>();
             foreach (var objectDB in objects)
             {
                 documents.AddRange(GetDocumentsForObject(objectDB.Id));
             }
-
-            // === Krok 2: Zdefiniowanie ścieżek ===
             string datePart = DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss");
             string fileName = $"Raport_{datePart}.pdf";
             string reportsFolder = System.IO.Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Reports");
@@ -512,7 +467,6 @@ namespace DocumentManagerApp
             string outputPath = System.IO.Path.Combine(reportsFolder, fileName);
             string logoPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "logo.png");
 
-            // === Krok 3: Generowanie PDF za pomocą iTextSharp (z pełnymi nazwami klas) ===
             try
             {
                 using (var fs = new System.IO.FileStream(outputPath, System.IO.FileMode.Create))
@@ -533,15 +487,11 @@ namespace DocumentManagerApp
                     {
                         iTextSharp.text.Image logo = iTextSharp.text.Image.GetInstance(logoPath);
 
-                        // ZMIANA: Ustawiamy szerokość i wysokość na tę samą, większą wartość.
                         logo.ScaleAbsolute(90f, 90f);
-
-                        // ZMIANA: Aktualizujemy pozycję Y, uwzględniając nową, większą wysokość logo.
                         logo.SetAbsolutePosition(36, doc.PageSize.Height - 18 - 100f);
 
                         doc.Add(logo);
                     }
-
                     // --- Tytuł ---
                     var title = new iTextSharp.text.Paragraph("Raport obiektów i dokumentów", titleFont)
                     {
@@ -550,7 +500,6 @@ namespace DocumentManagerApp
                         SpacingAfter = 30f
                     };
                     doc.Add(title);
-
                     // --- Główna treść raportu ---
                     foreach (var objectDB in objects)
                     {
@@ -576,10 +525,8 @@ namespace DocumentManagerApp
                             }
                             doc.Add(docList);
                         }
-
                         doc.Add(new iTextSharp.text.Paragraph(" ") { SpacingAfter = 5f });
                     }
-
                     doc.Close();
                 }
 
@@ -678,13 +625,12 @@ namespace DocumentManagerApp
                             string user = reader["UserName"]?.ToString() ?? "";
                             string action = reader["Action"]?.ToString() ?? "";
                             string target = reader["Target"]?.ToString() ?? "";
-                            
-                            // Parsujemy datę i formatujemy tylko godzina:minuty
+
                             DateTime timestamp;
                             if (!DateTime.TryParse(reader["Timestamp"]?.ToString(), out timestamp))
                                 timestamp = DateTime.Now;
 
-                            string time = timestamp.ToString("HH:mm"); // godziny:minuty
+                            string time = timestamp.ToString("HH:mm");
                             
                             MiniLogTextBlock.Text = $"{user}, godzina {time} - {action} ({target})";
                         }
@@ -703,52 +649,41 @@ namespace DocumentManagerApp
         private void UpdateButtonStates()
         {
             bool isObjectSelected = ObjectsDataGrid.SelectedItem != null;
-            var selectedDocument = DocumentsDataGrid.SelectedItem as Document; // Pobieramy zaznaczony dokument
+            var selectedDocument = DocumentsDataGrid.SelectedItem as Document; 
             bool isDocumentSelected = selectedDocument != null;
             bool selectedDocumentIsActive = isDocumentSelected && selectedDocument.IsActive;
             bool selectedDocumentHasHistory = false;
 
-            // Sprawdzamy historię tylko, jeśli dokument jest zaznaczony i ma VersionGroupId
             if (isDocumentSelected && selectedDocument.VersionGroupId.HasValue)
             {
                 selectedDocumentHasHistory = DatabaseHelper.DocumentHasHistory(selectedDocument.VersionGroupId.Value);
             }
 
-            // Ustawiamy IsEnabled/Visibility dla przycisków obiektów
             EditObjectButton.IsEnabled = isObjectSelected;
             DeleteObjectButton.IsEnabled = isObjectSelected;
-            AddDocumentButton.IsEnabled = isObjectSelected; // Można dodać dokument (wersję 1) tylko do obiektu
+            AddDocumentButton.IsEnabled = isObjectSelected;
 
-            // Ustawiamy IsEnabled/Visibility dla przycisków dokumentów
-            DeleteDocumentButton.IsEnabled = isDocumentSelected; // Można usunąć dowolną wersję (?) - do przemyślenia
+            DeleteDocumentButton.IsEnabled = isDocumentSelected;
             ShowPdfButton.IsEnabled = isDocumentSelected;
 
-            // Logika dla nowych przycisków wersji
-            AddNewVersionButton.IsEnabled = selectedDocumentIsActive; // Aktywny tylko dla aktywnej wersji
-            ShowVersionHistoryButton.Visibility = selectedDocumentHasHistory ? Visibility.Visible : Visibility.Collapsed; // Widoczny tylko, gdy jest historia
+            AddNewVersionButton.IsEnabled = selectedDocumentIsActive;
+            ShowVersionHistoryButton.Visibility = selectedDocumentHasHistory ? Visibility.Visible : Visibility.Collapsed;
         }
         private void ClosePdfViewerButton_Click(object sender, RoutedEventArgs e)
         {
-            PdfViewer.Visibility = Visibility.Collapsed; // Ukryj podgląd
-            ClosePdfViewerButton.Visibility = Visibility.Collapsed; // Ukryj przycisk "X"
-                                                                    // Opcjonalnie: Wyzeruj Source, jeśli chcesz zwolnić zasoby od razu, ale ukrycie powinno wystarczyć
-                                                                    // if (PdfViewer != null && PdfViewer.CoreWebView2 != null)
-                                                                    // {
-                                                                    //     PdfViewer.CoreWebView2.Navigate("about:blank");
-                                                                    // }
+            PdfViewer.Visibility = Visibility.Collapsed;
+            ClosePdfViewerButton.Visibility = Visibility.Collapsed;                                                                
         }
         private void ShowVersionHistoryButton_Click(object sender, RoutedEventArgs e)
         {
-            // Pobieramy zaznaczony DOKUMENT
             if (DocumentsDataGrid.SelectedItem is Document selectedDocument && selectedDocument.VersionGroupId.HasValue)
             {
-                // Tworzymy i pokazujemy nowe okno, przekazując ID grupy wersji i nazwę pliku
                 var historyWindow = new DocumentManagerApp.Views.VersionHistoryWindow(
                     selectedDocument.VersionGroupId.Value,
-                    selectedDocument.FileName // Przekazujemy nazwę pliku dla tytułu okna
+                    selectedDocument.FileName 
                 );
-                historyWindow.Owner = this; // Ustawiamy MainWindow jako właściciela
-                historyWindow.ShowDialog(); // ShowDialog() blokuje MainWindow do czasu zamknięcia okna historii
+                historyWindow.Owner = this;
+                historyWindow.ShowDialog();
             }
             else
             {
@@ -757,19 +692,16 @@ namespace DocumentManagerApp
         }
         private void AddNewVersionButton_Click(object sender, RoutedEventArgs e)
         {
-            // Pobieramy zaznaczony DOKUMENT (powinien być aktywny, bo przycisk jest włączony)
             if (DocumentsDataGrid.SelectedItem is Document selectedDocument && selectedDocument.IsActive)
             {
-                // Otwieramy okno AddDocumentWindow, używając NOWEGO konstruktora
                 var addVersionWindow = new DocumentManagerApp.Views.AddDocumentWindow(selectedDocument);
-                addVersionWindow.Owner = this; // Ustawienie właściciela okna
-                addVersionWindow.OnDataChanged = RefreshMiniLog; // Podpięcie odświeżania logu
+                addVersionWindow.Owner = this;
+                addVersionWindow.OnDataChanged = RefreshMiniLog;
 
                 if (addVersionWindow.ShowDialog() == true)
                 {
                     MessageBox.Show($"Nowa wersja (v{selectedDocument.Version + 1}) została dodana.");
 
-                    // Odświeżamy listę dokumentów dla bieżącego obiektu
                     if (ObjectsDataGrid.SelectedItem is Models.Object currentObject)
                     {
                         LoadDocumentsForObject(currentObject.Id);

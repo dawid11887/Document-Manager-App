@@ -13,13 +13,11 @@ namespace DocumentManagerApp.Views
         public Action OnManageUsers { get; set; }
         public Action OnClose { get; set; }
         public Action OnOpenLogs { get; set; }
-
         public AdminStatsView()
         {
             InitializeComponent();
             LoadStatistics();
         }
-
         private void LoadStatistics()
         {
             using (var connection = DatabaseHelper.GetConnection())
@@ -67,7 +65,6 @@ namespace DocumentManagerApp.Views
                 DiskUsageTextBlock.Text = diskUsage;
             }
         }
-
         private int GetObjectsWithoutDocumentsCount()
         {
             using var connection = DatabaseHelper.GetConnection();
@@ -76,7 +73,6 @@ namespace DocumentManagerApp.Views
             using var cmd = new SQLiteCommand(query, connection);
             return Convert.ToInt32(cmd.ExecuteScalar());
         }
-
         private string GetDocumentStorageUsage()
         {
             string folderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DocumentsStorage");
@@ -89,10 +85,8 @@ namespace DocumentManagerApp.Views
             double totalMB = totalBytes / (1024.0 * 1024.0);
             return $"Zajętość dysku: {totalMB:F2} MB";
         }
-
         private void ManageUsers_Click(object sender, RoutedEventArgs e) => OnManageUsers?.Invoke();
         private void CloseButton_Click(object sender, RoutedEventArgs e) => OnClose?.Invoke();
         private void OpenLogs_Click(object sender, RoutedEventArgs e) => OnOpenLogs?.Invoke();
-
     }
 }

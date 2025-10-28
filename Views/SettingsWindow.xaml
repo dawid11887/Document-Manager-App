@@ -56,17 +56,13 @@
                 <RowDefinition/>
                 <!-- Zawartość -->
             </Grid.RowDefinitions>
-
             <!-- Pasek tytułowy -->
             <Grid Grid.Row="0" Background="#214866">
                 <local:CustomTitleBarMini Grid.Row="0"/>
             </Grid>
-
             <Grid Grid.Row="1">
-
                 <Border CornerRadius="12" Padding="0" Background="#FAFAFA" Margin="30,20,30,20">
                     <StackPanel Margin="30" VerticalAlignment="Top">
-                        <!-- Otwórz folder bazowy -->
                         <Button Content="📂 Otwórz folder dokumentów" 
                             Margin="0,0,0,10" 
                             Click="OpenBaseFolder_Click"
@@ -75,7 +71,7 @@
                             HorizontalAlignment="Center"
                             IsDefault="True"
                             Style="{StaticResource ActionButtonStyle}"/>
-                                        <Button Content="📂 Otwórz folder raportów" 
+                        <Button Content="📂 Otwórz folder raportów" 
                             Margin="0,0,0,10" 
                             Click="OpenReportFolder_Click"
                             Width="250" Height="40"

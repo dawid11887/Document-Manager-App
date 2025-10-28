@@ -157,7 +157,7 @@
                                                 Click="ShowVersionHistoryButton_Click"
                                                 Style="{StaticResource ActionButtonStyle}"
                                                 Visibility="Collapsed"/>
-                                        <Button x:Name="DeleteDocumentButton" Width="160" Height="40" Content="🗑️ Usuń" Click="DeleteDocumentButton_Click" Style="{StaticResource DeleteButtonStyle}" Margin="0"/>
+                                        <Button x:Name="DeleteDocumentButton" Width="150" Height="40" Content="🗑️ Usuń" Click="DeleteDocumentButton_Click" Style="{StaticResource DeleteButtonStyle}" Margin="0"/>
                                     </StackPanel>
                                 </GroupBox>
                                 <Button x:Name="ShowPdfButton" Content="👁️ Pokaż PDF" Width="150" Height="40" Click="ShowPdfButton_Click" Style="{StaticResource ActionButtonStyle}"/>

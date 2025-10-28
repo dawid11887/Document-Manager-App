@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Height="540" Width="650">
     <UserControl.Resources>
-        <!-- 🎨 Kolory -->
+        <!-- Kolory -->
         <SolidColorBrush x:Key="PrimaryBrush" Color="#5094A3"/>
         <SolidColorBrush x:Key="PrimaryBrushHover" Color="#2F6CA1"/>
         <SolidColorBrush x:Key="CardBackgroundBrush" Color="White"/>

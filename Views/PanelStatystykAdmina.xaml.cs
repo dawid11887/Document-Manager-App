@@ -29,7 +29,7 @@ namespace DocumentManagerApp.Views
         {
             var statsView = new AdminStatsView();
             statsView.OnManageUsers = ShowUsersView;
-            statsView.OnOpenLogs = ShowLogsView;   // ⬅️ NOWA LINIJKA
+            statsView.OnOpenLogs = ShowLogsView;
             statsView.OnClose = () => Close();
             MainContent.Content = statsView;
         }

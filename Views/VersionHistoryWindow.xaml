@@ -30,11 +30,11 @@
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-
+            
             <Grid Grid.Row="0" Background="#214866">
                 <local:CustomTitleBarMini/>
             </Grid>
-
+            
             <Border Grid.Row="1" CornerRadius="12" Background="#FAFAFA" Margin="20">
                 <Grid Margin="15">
                     <Grid.RowDefinitions>
@@ -42,15 +42,14 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-
+                    
                     <TextBlock x:Name="InfoWindow" Grid.Row="0" Margin="0,0,0,10" FontWeight="SemiBold" FontSize="14" Text="Historia wersji dla dokumentu: ..."/>
-
+                    
                     <DataGrid x:Name="VersionHistoryDataGrid" Grid.Row="1" AutoGenerateColumns="False"
                               IsReadOnly="True" CanUserAddRows="False" SelectionMode="Single"
                               HeadersVisibility="Column" GridLinesVisibility="None"
                               RowHeight="40" FontSize="14" FontFamily="Segoe UI" AlternatingRowBackground="#F9F9F9"
                               Background="White" BorderThickness="1" BorderBrush="#DDD">
-
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="Background" Value="#1C3B55"/>
@@ -81,7 +80,7 @@
                             <DataGridTextColumn Header="Kategoria" Binding="{Binding Category}" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>
-
+                    
                     <Button Grid.Row="2" Content="Zamknij" FontWeight="Bold" IsCancel="True" Click="CloseButton_Click" Style="{StaticResource DialogButtonStyle}"/>
                 </Grid>
             </Border>

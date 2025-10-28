@@ -19,16 +19,12 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
-                <!-- Pasek -->
                 <RowDefinition/>
-                <!-- Zawartość -->
             </Grid.RowDefinitions>
-
             <!-- Pasek tytułowy -->
             <Grid Grid.Row="0" Background="#214866">
                 <local:CustomTitleBarMini Grid.Row="0"/>
             </Grid>
-
             <!-- Właściwa zawartość okna -->
             <Grid Grid.Row="1">
                 <Border CornerRadius="12" Padding="0" Background="#FAFAFA" Margin="30,20,30,20">
@@ -41,7 +37,6 @@
                                 VerticalAlignment="Center"
                                 TextAlignment="Center"/>
                         </Grid>
-
                         <!-- Tytuł aplikacji -->
                         <TextBlock Text="Aplikacja do zarządzania 
                                 dokumentacją techniczną"
@@ -50,14 +45,12 @@
                                 FontWeight="Bold"
                                 Margin="0,15,0,5"
                                 TextWrapping="Wrap"/>
-
                         <!-- Podtytuł -->
                         <TextBlock Text="Bezpieczny dostęp do dokumentów"
                               FontSize="12"
                               Opacity="0.7"
                               TextAlignment="Center"
                               Margin="0,0,0,20"/>
-
                         <!-- Pola logowania -->
                         <StackPanel Margin="0,0,0,10">
                             <TextBlock Text="Nazwa użytkownika" FontSize="12"/>
@@ -66,13 +59,11 @@
                             <TextBlock Text="Hasło" FontSize="12"/>
                             <PasswordBox x:Name="PasswordBox" Height="28" Margin="0,5,0,0"/>
                         </StackPanel>
-
                         <!-- Pamiętaj mnie + zapomniałem hasła MOŻE KIEDYŚ DOROBIE-->
                         <StackPanel Orientation="Horizontal" 
                            HorizontalAlignment="Right"
                            Margin="0,5,0,15">
                         </StackPanel>
-
                         <!-- Przycisk logowania -->
                         <Button Content="Zaloguj" 
                            Width="100" Height="32"
@@ -81,7 +72,6 @@
                            Click="Login_Click"
                            IsDefault="True"
                            Style="{StaticResource ActionButtonStyle}"/>
-
                         <!-- Wersja aplikacji -->
                         <TextBlock Text="v1.0.0" 
                           HorizontalAlignment="Right"

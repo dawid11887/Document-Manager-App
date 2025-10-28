@@ -10,14 +10,9 @@
         <SolidColorBrush x:Key="PrimaryBrushDEL" Color="#FF4B5C"/>
         <SolidColorBrush x:Key="PrimaryBrushHoverDEL" Color="#7C262F"/>
 
-        <!-- Konwertery: 1) pierwsza litera, 2) kolor avatara z nazwy -->
         <local:FirstLetterConverter x:Key="FirstLetterConverter"/>
         <local:UsernameColorBrushConverter x:Key="UsernameColorBrushConverter"/>
-
-        <!-- Tło kafelków -->
         <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFF3F4F6"/>
-
-        <!-- Brak hover/selection highlight + rozciąganie na szerokość -->
         <Style x:Key="NoHoverListViewItemStyle" TargetType="ListViewItem">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -28,7 +23,6 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListViewItem">
-                        <!-- Brak triggerów -> żadnego podświetlania hover/selection -->
                         <Border Background="{TemplateBinding Background}">
                             <ContentPresenter/>
                         </Border>
@@ -107,7 +101,6 @@
                 <RowDefinition Height="Auto"/>
                 <!-- Panel edycji -->
             </Grid.RowDefinitions>
-
             <!-- Lista kafelków -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0">
                 <ListView x:Name="UsersList"
@@ -127,13 +120,12 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-
                                     <!-- Avatar -->
                                     <Border Grid.Column="0"
-                                    Width="40" Height="40"
-                                    CornerRadius="20"
-                                    VerticalAlignment="Center"
-                                    Background="{Binding Username, Converter={StaticResource UsernameColorBrushConverter}}">
+                                        Width="40" Height="40"
+                                        CornerRadius="20"
+                                        VerticalAlignment="Center"
+                                        Background="{Binding Username, Converter={StaticResource UsernameColorBrushConverter}}">
                                         <TextBlock Text="{Binding Username, Converter={StaticResource FirstLetterConverter}}"
                                            Foreground="White"
                                            FontWeight="Bold"
@@ -141,7 +133,6 @@
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"/>
                                     </Border>
-
                                     <!-- Teksty -->
                                     <StackPanel Grid.Column="1"
                                         Orientation="Vertical"
@@ -154,24 +145,23 @@
                                            FontSize="12"
                                            Opacity="0.8"/>
                                     </StackPanel>
-
                                     <!-- Akcje -->
                                     <StackPanel Grid.Column="2"
                                         Orientation="Horizontal"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Right">
                                         <Button Content="Edytuj"
-                                        Margin="0,5,5,5"
-                                        Click="Edit_Click"
-                                        IsDefault="True"
-                                        FontWeight="Bold"    
-                                        Style="{StaticResource ActionButtonStyle}"/>
+                                            Margin="0,5,5,5"
+                                            Click="Edit_Click"
+                                            IsDefault="True"
+                                            FontWeight="Bold"    
+                                            Style="{StaticResource ActionButtonStyle}"/>
                                         <Button Content="Usuń"
-                                        Margin="0,5,5,5"
-                                        Click="Delete_Click"
-                                        IsDefault="True"
-                                        FontWeight="Bold"
-                                        Style="{StaticResource DeleteButtonStyle}"/>
+                                            Margin="0,5,5,5"
+                                            Click="Delete_Click"
+                                            IsDefault="True"
+                                            FontWeight="Bold"
+                                            Style="{StaticResource DeleteButtonStyle}"/>
                                     </StackPanel>
                                 </Grid>
                             </Border>
@@ -179,7 +169,6 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </ScrollViewer>
-
             <!-- Panel edycji -->
             <Border Grid.Row="1"
                 x:Name="EditUserPanel"
@@ -188,7 +177,6 @@
                 Padding="12,17"
                 Margin="1"
                 Visibility="Collapsed">
-
                 <StackPanel>
                     <!-- Górna część: Avatar + nazwa i rola -->
                     <Grid Margin="0,0,0,10">
@@ -196,7 +184,6 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-
                         <!-- Avatar -->
                         <Border Grid.Column="0"
                             Width="40" Height="40"
@@ -210,23 +197,20 @@
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"/>
                         </Border>
-
                         <!-- Nazwa i rola -->
                         <StackPanel Grid.Column="1" Orientation="Vertical" Margin="12,0,0,0" VerticalAlignment="Center">
                             <TextBlock x:Name="EditUsernameText" FontSize="14" FontWeight="SemiBold"/>
                             <TextBlock x:Name="EditRoleText" FontSize="12" Opacity="0.7"/>
                         </StackPanel>
                     </Grid>
-
                     <!-- Zmiana hasła -->
-                    <GroupBox Header="🔑 Zmiana hasła" Margin="10,0,10,10" TextBlock.Foreground="Black" Style="{StaticResource EditPasswordGroupBoxStyle}"> 
+                    <GroupBox Header="🔑 Zmiana hasła" Margin="10,0,10,10" TextBlock.Foreground="Black" Style="{StaticResource EditPasswordGroupBoxStyle}">
                         <StackPanel Margin="10">
                             <Button x:Name="ResetPasswordButton"
-                            Content="🔑 Resetuj Hasło" Background="Green"
-                            Width="210" Height="40" HorizontalAlignment="Center"
-                            Click="ResetPasswordButton_Click"
-                            Style="{StaticResource ActionButtonStyle}"/>
-
+                                Content="🔑 Resetuj Hasło" Background="Green"
+                                Width="210" Height="40" HorizontalAlignment="Center"
+                                Click="ResetPasswordButton_Click"
+                                Style="{StaticResource ActionButtonStyle}"/>
                             <StackPanel x:Name="ChangePasswordPanel" Visibility="Collapsed" Margin="50,10,50,0">
                                 <TextBlock Text="Nowe hasło:" FontSize="11" Margin="0,0,0,2"/>
                                 <PasswordBox x:Name="NewPasswordBox" Height="28" Margin="0,0,0,10"
@@ -277,7 +261,6 @@
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>
-
                     <!-- Przyciski -->
                     <Button Content="Wyjdź" Width="210" HorizontalAlignment="Center" Margin="0,5,0,0" Click="CancelEdit_Click" IsDefault="True"
                         FontWeight="Bold" 

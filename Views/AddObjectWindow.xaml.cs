@@ -31,7 +31,6 @@ namespace DocumentManagerApp.Views
         {
             editingObject = objectToEdit;
 
-            // Ustawiamy dane do edycji
             if (editingObject != null)
             {
                 Title = "Edytuj obiekt";
@@ -53,7 +52,6 @@ namespace DocumentManagerApp.Views
 
             if (editingObject == null)
             {
-                // === DODAWANIE NOWEJ MASZYNY ===
                 var newObject = new Models.Object
                 {
                     Name = name,
@@ -68,7 +66,6 @@ namespace DocumentManagerApp.Views
             }
             else
             {
-                // === EDYCJA ISTNIEJĄCEJ MASZYNY ===
                 editingObject.Name = name;
                 editingObject.Location = LocationTextBox.Text.Trim();
                 editingObject.Description = DescriptionTextBox.Text.Trim();
@@ -78,7 +75,6 @@ namespace DocumentManagerApp.Views
                 DatabaseHelper.UpdateObject(editingObject);
                 DatabaseHelper.AddChangeLog(UserSession.CurrentUser.Username, "Edytowano obiekt", $"Objekt: {name}");
             }
-
             OnDataChanged?.Invoke();
             DialogResult = true;
             Close();

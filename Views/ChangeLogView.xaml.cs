@@ -12,14 +12,12 @@ namespace DocumentManagerApp.Views
     public partial class ChangeLogView : UserControl
     {
         public Action OnBack { get; set; }
-
         public ChangeLogView()
         {
             InitializeComponent();
             LoadLogs();
         }
         private List<ChangeLog> allLogs = new List<ChangeLog>();
-
         private void LoadLogs()
         {
             allLogs.Clear();
@@ -41,8 +39,6 @@ namespace DocumentManagerApp.Views
                             Action = reader["Action"]?.ToString() ?? "",
                             Target = reader["Target"]?.ToString() ?? ""
                         };
-
-                        // Parsowanie Timestamp
                         var tsObj = reader["Timestamp"]?.ToString();
                         if (!string.IsNullOrEmpty(tsObj) && DateTime.TryParse(tsObj, out var dt))
                             log.Timestamp = dt;
@@ -53,12 +49,8 @@ namespace DocumentManagerApp.Views
                     }
                 }
             }
-
-            // Ustaw dane do wyświetlenia
             ChangeLogDataGrid.ItemsSource = new List<ChangeLog>(allLogs);
         }
-
-
         private void Back_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             OnBack?.Invoke();
@@ -81,7 +73,6 @@ namespace DocumentManagerApp.Views
             {
                 if (actionFilter == "Inne")
                 {
-                    // pokaż tylko akcje spoza standardowej listy
                     string[] knownActions = {
                         "Dodano obiekt",
                         "Edytowano obiekt",
@@ -105,7 +96,6 @@ namespace DocumentManagerApp.Views
 
             ChangeLogDataGrid.ItemsSource = filtered;
         }
-
         private void Filter_Changed(object sender, EventArgs e)
         {
             ApplyFilters();
@@ -117,6 +107,5 @@ namespace DocumentManagerApp.Views
             DateFilterBox.SelectedIndex = 0;
             ApplyFilters();
         }
-
     }
 }

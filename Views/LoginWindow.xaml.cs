@@ -13,7 +13,6 @@ namespace DocumentManagerApp.Views
         {
             InitializeComponent();
         }
-
         private void Login_Click(object sender, RoutedEventArgs e)
         {
             string username = UsernameBox.Text?.Trim();
@@ -24,7 +23,6 @@ namespace DocumentManagerApp.Views
                 MessageBox.Show("Wprowadź nazwę użytkownika i hasło.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // W pliku Views/LoginWindow.xaml.cs, wewnątrz metody Login_Click
             using (var connection = DatabaseHelper.GetConnection())
             {
                 connection.Open();
@@ -38,14 +36,13 @@ namespace DocumentManagerApp.Views
                             var savedHash = reader["Password"]?.ToString();
                             var savedSalt = reader["Salt"]?.ToString();
 
-                            // Sprawdzamy hasło nową, bezpieczną metodą
                             if (Helpers.PasswordHelper.VerifyPassword(password, savedHash, savedSalt))
                             {
                                 var user = new User
                                 {
                                     Id = Convert.ToInt32(reader["Id"]),
                                     Username = reader["Username"].ToString(),
-                                    Password = savedHash, // Przechowujemy hash, nie czysty tekst
+                                    Password = savedHash,
                                     Role = reader["Role"].ToString()
                                 };
                                 UserSession.Login(user);
@@ -57,10 +54,8 @@ namespace DocumentManagerApp.Views
                     }
                 }
             }
-
             MessageBox.Show("Nieprawidłowy login lub hasło", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-        
+        }     
     }
 }
 

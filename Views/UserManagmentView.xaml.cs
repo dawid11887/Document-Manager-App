@@ -48,24 +48,19 @@ namespace DocumentManagerApp.Views
         private User selectedUser;
         private void Edit_Click(object sender, RoutedEventArgs e)
         {
-            // Pobranie użytkownika z kafelka
             selectedUser = (sender as FrameworkElement)?.DataContext as User;
             if (selectedUser == null) return;
 
-            // Ustawienie DataContext panelu edycji – klucz do poprawnego avatara
             EditUserPanel.DataContext = selectedUser;
 
-            // Wypełnij pola edycji
             EditUsernameText.Text = selectedUser.Username;
             EditRoleText.Text = selectedUser.Role;
 
-            // Pokaż panel edycji i ukryj listę
             EditUserPanel.Visibility = Visibility.Visible;
             UsersList.Visibility = Visibility.Collapsed;
         }
         private void CancelEdit_Click(object sender, RoutedEventArgs e)
         {
-            // Cofnięcie do listy użytkowników
             EditUserPanel.Visibility = Visibility.Collapsed;
             UsersList.Visibility = Visibility.Visible;
 
@@ -84,7 +79,6 @@ namespace DocumentManagerApp.Views
             var user = (sender as FrameworkElement)?.DataContext as User;
             if (user == null) return;
 
-            // (opcjonalnie) Nie pozwalaj usuwać samego siebie
             if (UserSession.CurrentUser != null && user.Id == UserSession.CurrentUser.Id)
             {
                 MessageBox.Show("Nie możesz usunąć konta, na które jesteś aktualnie zalogowany.", "Blokada", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -104,7 +98,6 @@ namespace DocumentManagerApp.Views
                     cmd.ExecuteNonQuery();
                 }
             }
-
             LoadUsers();
         }
         private void ChangePassword_Click(object sender, RoutedEventArgs e)
@@ -126,8 +119,6 @@ namespace DocumentManagerApp.Views
                 MessageBox.Show("Podane hasła nie są takie same.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-
-            // --- Logika hashowania i zapisu (pozostaje bez zmian) ---
             var (newHash, newSalt) = Helpers.PasswordHelper.HashPassword(newPass);
             using (var connection = DatabaseHelper.GetConnection())
             {
@@ -141,35 +132,29 @@ namespace DocumentManagerApp.Views
                     cmd.ExecuteNonQuery();
                 }
             }
-            // --- Koniec logiki zapisu ---
-
             MessageBox.Show("Hasło zostało zresetowane pomyślnie.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            // Ukryj panel i pokaż przycisk Resetuj (tak jak po anulowaniu)
-            CancelPasswordReset_Click(sender, e); // Wywołujemy metodę anulowania, aby posprzątać UI
+            CancelPasswordReset_Click(sender, e);
         }
         private void ResetPasswordButton_Click(object sender, RoutedEventArgs e)
         {
-            // Ukryj przycisk Resetuj i pokaż panel zmiany hasła
             ResetPasswordButton.Visibility = Visibility.Collapsed;
             ChangePasswordPanel.Visibility = Visibility.Visible;
-            // Wyczyść pola na wszelki wypadek
+
             NewPasswordBox.Clear();
             ConfirmPasswordBox.Clear();
-            // Ustaw fokus na pierwszym polu
+
             NewPasswordBox.Focus();
         }
         private void CancelPasswordReset_Click(object sender, RoutedEventArgs e)
         {
-            // Ukryj panel zmiany hasła i pokaż przycisk Resetuj
             ChangePasswordPanel.Visibility = Visibility.Collapsed;
             ResetPasswordButton.Visibility = Visibility.Visible;
-            // Wyczyść pola
+
             NewPasswordBox.Clear();
             ConfirmPasswordBox.Clear();
         }
     }
-    // === Konwertery ===
     public class FirstLetterConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -184,7 +169,6 @@ namespace DocumentManagerApp.Views
 
     public class UsernameColorBrushConverter : IValueConverter
     {
-        // Kilka ładnych, spokojnych kolorów
         private static readonly Brush[] Palette =
         {
             new SolidColorBrush(Color.FromRgb(99,102,241)),   // indigo
@@ -196,18 +180,15 @@ namespace DocumentManagerApp.Views
             new SolidColorBrush(Color.FromRgb(34,197,94)),    // green
             new SolidColorBrush(Color.FromRgb(2,132,199))     // sky
         };
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var name = value as string;
             if (string.IsNullOrWhiteSpace(name))
                 return Brushes.Gray;
 
-            // Deterministyczny wybór koloru na bazie nazwy
             int hash = name.Aggregate(23, (acc, c) => acc * 31 + c);
             return Palette[Math.Abs(hash) % Palette.Length];
         }
-
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => Binding.DoNothing;
     }

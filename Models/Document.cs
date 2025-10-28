@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO; // Needed for Path.GetFileName
+using System.IO;
 
 namespace DocumentManagerApp.Models
 {

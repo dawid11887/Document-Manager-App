@@ -25,7 +25,6 @@ namespace TwojaNamespace
     {
         private static readonly string baseStoragePath = System.IO.Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "DocumentsStorage");
         private static readonly string reportsPath = System.IO.Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Reports");
-
         public SettingsWindow()
         {
             InitializeComponent();

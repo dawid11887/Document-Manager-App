@@ -6,7 +6,6 @@ namespace DocumentManagerApp.Helpers
 {
     public static class PasswordHelper
     {
-        // Tworzy hash i sól z podanego hasła
         public static (string hash, string salt) HashPassword(string password)
         {
             byte[] saltBytes = RandomNumberGenerator.GetBytes(16);
@@ -15,8 +14,6 @@ namespace DocumentManagerApp.Helpers
 
             return (Convert.ToBase64String(hashBytes), Convert.ToBase64String(saltBytes));
         }
-
-        // Sprawdza, czy podane hasło pasuje do zapisanego hasha i soli
         public static bool VerifyPassword(string password, string savedHash, string savedSalt)
         {
             byte[] saltBytes = Convert.FromBase64String(savedSalt);

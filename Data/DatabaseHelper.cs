@@ -14,7 +14,6 @@ namespace DocumentManagerApp.Data
     {
         private static readonly string dbFile = "data.db";
         private static readonly string connectionString = $"Data Source={dbFile};Version=3;";
-
         public static void InitializeDatabase()
         {
             if (!File.Exists(dbFile))
@@ -87,8 +86,6 @@ namespace DocumentManagerApp.Data
                 {
                     command.ExecuteNonQuery();
                 }
-                
-                // Seed domyślnych użytkowników, jeśli tabela jest pusta
                 using (var cmd = new SQLiteCommand("SELECT COUNT(*) FROM Users", connection))
                 {
                     var count = Convert.ToInt32(cmd.ExecuteScalar());
@@ -140,7 +137,7 @@ namespace DocumentManagerApp.Data
             using (var connection = GetConnection())
             {
                 connection.Open();
-                string query = "SELECT * FROM Objects"; // Zapytanie pozostaje bez zmian
+                string query = "SELECT * FROM Objects";
                 using (var command = new SQLiteCommand(query, connection))
                 using (var reader = command.ExecuteReader())
                 {
@@ -198,30 +195,27 @@ namespace DocumentManagerApp.Data
             {
                 connection.Open();
 
-                // Krok 1: Usuń wszystkie dokumenty powiązane z maszyną
+                // usunięcie wszystkich dokumentów powiązanych z obiektem
                 var deleteDocsCmd = new SQLiteCommand("DELETE FROM Documents WHERE ObjectId = @ObjectId", connection);
                 deleteDocsCmd.Parameters.AddWithValue("@ObjectId", objectId);
                 deleteDocsCmd.ExecuteNonQuery();
 
-                // Krok 2: Usuń sam obiekt
+                // usunięcie obiektu
                 var deleteObjectCmd = new SQLiteCommand("DELETE FROM Objects WHERE Id = @Id", connection);
                 deleteObjectCmd.Parameters.AddWithValue("@Id", objectId);
                 deleteObjectCmd.ExecuteNonQuery();
             }
         }
-        // ✨ NOWA WERSJA METODY: Usuwa wszystkie wersje dokumentu ✨
         public static List<string> GetFilePathsForVersionGroup(int? versionGroupId)
         {
             var filePaths = new List<string>();
             if (!versionGroupId.HasValue)
             {
-                return filePaths; // Zwróć pustą listę, jeśli nie ma grupy
+                return filePaths;
             }
-
             using (var connection = GetConnection())
             {
                 connection.Open();
-                // Pobieramy FilePath wszystkich dokumentów dla danego VersionGroupId
                 string query = "SELECT FilePath FROM Documents WHERE VersionGroupId = @GroupId";
                 using (var command = new SQLiteCommand(query, connection))
                 {
@@ -230,7 +224,6 @@ namespace DocumentManagerApp.Data
                     {
                         while (reader.Read())
                         {
-                            // Upewniamy się, że ścieżka nie jest pusta
                             string filePath = reader.GetString(reader.GetOrdinal("FilePath"));
                             if (!string.IsNullOrEmpty(filePath))
                             {
@@ -242,9 +235,8 @@ namespace DocumentManagerApp.Data
             }
             return filePaths;
         }
-        public static void DeleteDocumentAndAllVersions(int? versionGroupId) // Przyjmuje nullable int
+        public static void DeleteDocumentAndAllVersions(int? versionGroupId) 
         {
-            // Jeśli VersionGroupId jest null, nie ma czego usuwać (choć nie powinno się to zdarzyć przy poprawnym zaznaczeniu)
             if (!versionGroupId.HasValue)
             {
                 Console.WriteLine("Próba usunięcia dokumentu bez VersionGroupId.");
@@ -254,14 +246,13 @@ namespace DocumentManagerApp.Data
             using (var connection = GetConnection())
             {
                 connection.Open();
-                // Usuwamy WSZYSTKIE dokumenty należące do tej samej grupy wersji
+                // usuwamy WSZYSTKIE dokumenty należące do tej samej grupy wersji
                 var cmd = new SQLiteCommand("DELETE FROM Documents WHERE VersionGroupId = @GroupId", connection);
                 cmd.Parameters.AddWithValue("@GroupId", versionGroupId.Value);
                 int affectedRows = cmd.ExecuteNonQuery();
                 Console.WriteLine($"Usunięto {affectedRows} wersji dokumentu z grupy {versionGroupId.Value}.");
             }
         }
-        // Metoda do DODAWANIA nowego obiektu
         public static void AddObject(Models.Object objectDB)
         {
             using (var connection = GetConnection())
@@ -279,7 +270,6 @@ namespace DocumentManagerApp.Data
                 }
             }
         }
-        // Metoda do AKTUALIZOWANIA istniejącej maszyny
         public static void UpdateObject(Models.Object objectDB)
         {
             using (var connection = GetConnection())
@@ -332,40 +322,36 @@ namespace DocumentManagerApp.Data
             using (var connection = GetConnection())
             {
                 connection.Open();
-                // Sprawdzamy, czy istnieje JAKIKOLWIEK inny dokument w tej samej grupie wersji, który NIE JEST aktywny
+                
                 string query = "SELECT COUNT(*) FROM Documents WHERE VersionGroupId = @GroupId AND IsActive = 0";
                 using (var command = new SQLiteCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@GroupId", versionGroupId);
                     var count = Convert.ToInt32(command.ExecuteScalar());
-                    return count > 0; // Zwraca true, jeśli znaleziono co najmniej jedną starszą wersję
+                    return count > 0; 
                 }
             }
         }
-        // W pliku Data/DatabaseHelper.cs
         public static void AddNewDocumentVersion(Document newVersionData, int oldVersionId)
         {
             using (var connection = GetConnection())
             {
                 connection.Open();
-                // Używamy transakcji, aby obie operacje (UPDATE i INSERT) powiodły się albo żadna
+                
                 using (var transaction = connection.BeginTransaction())
                 {
                     try
-                    {
-                        // Krok 1: Deaktywuj starą wersję
+                    {                     
                         string updateQuery = "UPDATE Documents SET IsActive = 0 WHERE Id = @OldId";
                         using (var updateCmd = new SQLiteCommand(updateQuery, connection, transaction))
                         {
                             updateCmd.Parameters.AddWithValue("@OldId", oldVersionId);
                             updateCmd.ExecuteNonQuery();
                         }
-
-                        // Krok 2: Wstaw nową wersję
                         string insertQuery = @"INSERT INTO Documents
-                    (ObjectId, FilePath, DocumentType, DateAdded, Category, Version, IsActive, VersionGroupId)
-                    VALUES
-                    (@ObjectId, @FilePath, @DocumentType, @DateAdded, @Category, @Version, @IsActive, @VersionGroupId)";
+                            (ObjectId, FilePath, DocumentType, DateAdded, Category, Version, IsActive, VersionGroupId)
+                            VALUES
+                            (@ObjectId, @FilePath, @DocumentType, @DateAdded, @Category, @Version, @IsActive, @VersionGroupId)";
                         using (var insertCmd = new SQLiteCommand(insertQuery, connection, transaction))
                         {
                             insertCmd.Parameters.AddWithValue("@ObjectId", newVersionData.ObjectId);
@@ -374,26 +360,22 @@ namespace DocumentManagerApp.Data
                             insertCmd.Parameters.AddWithValue("@DateAdded", newVersionData.DateAdded);
                             insertCmd.Parameters.AddWithValue("@Category", newVersionData.Category);
                             insertCmd.Parameters.AddWithValue("@Version", newVersionData.Version);
-                            insertCmd.Parameters.AddWithValue("@IsActive", 1); // Jawnie ustawiamy na 1 (true)
+                            insertCmd.Parameters.AddWithValue("@IsActive", 1);
                             insertCmd.Parameters.AddWithValue("@VersionGroupId", newVersionData.VersionGroupId);
                             insertCmd.ExecuteNonQuery();
                         }
-
-                        // Jeśli wszystko poszło dobrze, zatwierdź transakcję
                         transaction.Commit();
                     }
                     catch (Exception ex)
                     {
-                        // W razie błędu cofnij wszystkie zmiany
+                        // w razie błędu cofnij wszystkie zmiany
                         transaction.Rollback();
                         Console.WriteLine($"Błąd podczas dodawania nowej wersji dokumentu: {ex.Message}");
-                        // Można rzucić wyjątek dalej lub obsłużyć go inaczej
                         throw;
                     }
                 }
             }
         }
-        // Musisz dodać tę metodę, jeśli jej nie masz:
         public static Models.Object GetObjectById(int objectId)
         {
             Models.Object obj = null;
@@ -408,7 +390,7 @@ namespace DocumentManagerApp.Data
                     {
                         if (reader.Read())
                         {
-                            obj = new Models.Object // Użyj poprawnej nazwy klasy obiektu!
+                            obj = new Models.Object
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
@@ -423,14 +405,12 @@ namespace DocumentManagerApp.Data
             }
             return obj; // Zwróci null, jeśli nie znaleziono obiektu
         }
-        // W pliku Data/DatabaseHelper.cs
         public static List<Document> GetDocumentVersionHistory(int versionGroupId)
         {
             var documents = new List<Document>();
             using (var connection = GetConnection())
             {
                 connection.Open();
-                // Pobieramy WSZYSTKIE dokumenty dla danego VersionGroupId, sortując od najnowszej
                 string query = "SELECT * FROM Documents WHERE VersionGroupId = @GroupId ORDER BY Version DESC";
                 using (var command = new SQLiteCommand(query, connection))
                 {

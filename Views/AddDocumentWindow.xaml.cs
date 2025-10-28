@@ -31,9 +31,8 @@ namespace DocumentManagerApp.Views
         public AddDocumentWindow(Document documentToVersion)
         {
             InitializeComponent();
-            _documentToVersion = documentToVersion; // zapamiętujemy dokument do wersjonowania
+            _documentToVersion = documentToVersion; 
 
-            // pobieramy obiekt z dokumentu, który wersjonujemy
             _targetObject = DatabaseHelper.GetObjectById(_documentToVersion.ObjectId);
 
             if (_targetObject == null)
@@ -92,7 +91,7 @@ namespace DocumentManagerApp.Views
                 UpdateFileSelectionUI();
             }
         }
-        // ================== NOWA LOGIKA DRAG & DROP ==================
+        // ================== LOGIKA DRAG & DROP ==================
         // Metoda wywoływana, gdy plik jest przeciągany NAD obszar okna
         private void DropTarget_PreviewDragEnter(object sender, DragEventArgs e)
         {
